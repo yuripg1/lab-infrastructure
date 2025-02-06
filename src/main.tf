@@ -82,6 +82,20 @@ module "egress_to_anywhere_security_group" {
   prefix_list_ids = []
 }
 
+# Ingress ICMP Echo Request from anywhere (Security Group)
+module "ingress_icmp_echo_request_from_anywhere_security_group" {
+  source = "../modules/security-group/ingress-protocol-port"
+
+  name            = "ingress-icmp-echo-request-from-anywhere"
+  vpc_id          = module.vpc.id
+  cidr_ipv4       = ["0.0.0.0/0"]
+  cidr_ipv6       = []
+  from_port       = 8
+  ip_protocol     = "icmp"
+  prefix_list_ids = []
+  to_port         = 0
+}
+
 # Ingress SSH (Security Group)
 module "ingress_ssh_security_group" {
   source = "../modules/security-group/ingress-protocol-port"
@@ -156,7 +170,6 @@ module "ingress_iperf_udp_security_group" {
   to_port         = random_integer.iperf_port.result
 }
 
-
 # iperf EC2 Instance
 module "iperf_ec2_instance" {
   source = "../modules/ec2-instance"
@@ -173,6 +186,7 @@ module "iperf_ec2_instance" {
 
   vpc_security_group_ids = [
     module.egress_to_anywhere_security_group.id,
+    module.ingress_icmp_echo_request_from_anywhere_security_group.id,
     module.ingress_ssh_security_group.id,
     module.ingress_iperf_tcp_security_group.id,
     module.ingress_iperf_udp_security_group.id,

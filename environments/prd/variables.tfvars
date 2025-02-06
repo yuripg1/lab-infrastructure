@@ -17,8 +17,8 @@ ingress_ssh_ipv4_managed_prefix_list_entries_cidr = ["*.*.*.*/32"]
 ingress_iperf_ipv4_managed_prefix_list_entries_cidr = ["*.*.*.*/32"]
 ingress_iperf_ipv6_managed_prefix_list_entries_cidr = ["*:*:*:*::/64"]
 
-iperf_instance_ami         = "ami-080111c1449900431"
-iperf_instance_type        = "t2.medium"
+iperf_instance_ami         = "ami-015f3596bb2ef1aaa"
+iperf_instance_type        = "t3.small"
 iperf_instance_encryped    = false
 iperf_instance_volume_size = 16
-iperf_instance_volume_type = "gp2"
+iperf_instance_volume_type = "gp3"
