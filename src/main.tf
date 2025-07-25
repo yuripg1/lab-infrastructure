@@ -67,7 +67,7 @@ module "ingress_ssh_ipv4_managed_prefix_list" {
 
   name           = "ingress-ssh-ipv4"
   address_family = "IPv4"
-  max_entries    = length(var.ingress_ssh_ipv4_managed_prefix_list_entries_cidr)
+  max_entries    = 2
   entries_cidr   = var.ingress_ssh_ipv4_managed_prefix_list_entries_cidr
 }
 
@@ -113,8 +113,8 @@ module "ingress_ssh_security_group" {
 #################### iperf ####################
 
 resource "random_integer" "iperf_port" {
-  min = 49152
-  max = 65535
+  min = 1024
+  max = 49151
 }
 
 resource "random_integer" "iperf_subnet_index" {
@@ -128,7 +128,7 @@ module "ingress_iperf_ipv4_managed_prefix_list" {
 
   name           = "ingress-iperf-ipv4"
   address_family = "IPv4"
-  max_entries    = length(var.ingress_iperf_ipv4_managed_prefix_list_entries_cidr)
+  max_entries    = 2
   entries_cidr   = var.ingress_iperf_ipv4_managed_prefix_list_entries_cidr
 }
 
@@ -138,7 +138,7 @@ module "ingress_iperf_ipv6_managed_prefix_list" {
 
   name           = "ingress-iperf-ipv6"
   address_family = "IPv6"
-  max_entries    = length(var.ingress_iperf_ipv6_managed_prefix_list_entries_cidr)
+  max_entries    = 2
   entries_cidr   = var.ingress_iperf_ipv6_managed_prefix_list_entries_cidr
 }
 
