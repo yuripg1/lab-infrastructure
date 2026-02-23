@@ -73,48 +73,67 @@ module "ingress_ssh_ipv4_managed_prefix_list" {
 
 # Egress to anywhere (Security Group)
 module "egress_to_anywhere_security_group" {
-  source = "../modules/security-group/egress"
+  source = "../modules/security-group"
 
-  name            = "egress-to-anywhere"
-  vpc_id          = module.vpc.id
-  cidr_ipv4       = ["0.0.0.0/0"]
-  cidr_ipv6       = ["::/0"]
-  prefix_list_ids = []
+  name   = "egress-to-anywhere"
+  vpc_id = module.vpc.id
+
+  egress_rules = [
+    {
+      cidr_ipv4       = ["0.0.0.0/0"]
+      cidr_ipv6       = ["::/0"]
+      prefix_list_ids = []
+    },
+  ]
+
+  ingress_rules = []
 }
 
-# Ingress ICMP Echo Request from anywhere (Security Group)
-module "ingress_icmp_echo_request_from_anywhere_security_group" {
-  source = "../modules/security-group/ingress-protocol-port"
+# Ingress ping from anywhere (Security Group)
+module "ingress_ping_from_anywhere_security_group" {
+  source = "../modules/security-group"
 
-  name            = "ingress-icmp-echo-request-from-anywhere"
-  vpc_id          = module.vpc.id
-  cidr_ipv4       = ["0.0.0.0/0"]
-  cidr_ipv6       = []
-  from_port       = 8
-  ip_protocol     = "icmp"
-  prefix_list_ids = []
-  to_port         = 0
+  name   = "ingress-ping-from-anywhere"
+  vpc_id = module.vpc.id
+
+  ingress_rules = [
+    {
+      cidr_ipv4   = ["0.0.0.0/0"]
+      from_port   = 8
+      ip_protocol = "icmp"
+      to_port     = 0
+    },
+    {
+      cidr_ipv6   = ["::/0"]
+      from_port   = 128
+      ip_protocol = "icmpv6"
+      to_port     = 0
+    },
+  ]
 }
 
 # Ingress SSH (Security Group)
 module "ingress_ssh_security_group" {
-  source = "../modules/security-group/ingress-protocol-port"
+  source = "../modules/security-group"
 
-  name            = "ingress-ssh"
-  vpc_id          = module.vpc.id
-  cidr_ipv4       = []
-  cidr_ipv6       = []
-  from_port       = 22
-  ip_protocol     = "tcp"
-  prefix_list_ids = [module.ingress_ssh_ipv4_managed_prefix_list.id]
-  to_port         = 22
+  name   = "ingress-ssh"
+  vpc_id = module.vpc.id
+
+  ingress_rules = [
+    {
+      from_port       = 22
+      ip_protocol     = "tcp"
+      prefix_list_ids = [module.ingress_ssh_ipv4_managed_prefix_list.id]
+      to_port         = 22
+    },
+  ]
 }
 
 #################### iperf ####################
 
 resource "random_integer" "iperf_port" {
-  min = 1024
-  max = 49151
+  min = 49152
+  max = 65535
 }
 
 resource "random_integer" "iperf_subnet_index" {
@@ -142,32 +161,27 @@ module "ingress_iperf_ipv6_managed_prefix_list" {
   entries_cidr   = var.ingress_iperf_ipv6_managed_prefix_list_entries_cidr
 }
 
-# Ingress iperf TCP (Security Group)
-module "ingress_iperf_tcp_security_group" {
-  source = "../modules/security-group/ingress-protocol-port"
+# Ingress iperf (Security Group)
+module "ingress_iperf_security_group" {
+  source = "../modules/security-group"
 
-  name            = "ingress-iperf-tcp"
-  vpc_id          = module.vpc.id
-  cidr_ipv4       = []
-  cidr_ipv6       = []
-  from_port       = random_integer.iperf_port.result
-  ip_protocol     = "tcp"
-  prefix_list_ids = [module.ingress_ssh_ipv4_managed_prefix_list.id, module.ingress_iperf_ipv6_managed_prefix_list.id]
-  to_port         = random_integer.iperf_port.result
-}
+  name   = "ingress-iperf"
+  vpc_id = module.vpc.id
 
-# Ingress iperf UDP (Security Group)
-module "ingress_iperf_udp_security_group" {
-  source = "../modules/security-group/ingress-protocol-port"
-
-  name            = "ingress-iperf-udp"
-  vpc_id          = module.vpc.id
-  cidr_ipv4       = []
-  cidr_ipv6       = []
-  from_port       = random_integer.iperf_port.result
-  ip_protocol     = "udp"
-  prefix_list_ids = [module.ingress_ssh_ipv4_managed_prefix_list.id, module.ingress_iperf_ipv6_managed_prefix_list.id]
-  to_port         = random_integer.iperf_port.result
+  ingress_rules = [
+    {
+      from_port       = random_integer.iperf_port.result
+      ip_protocol     = "tcp"
+      prefix_list_ids = [module.ingress_ssh_ipv4_managed_prefix_list.id, module.ingress_iperf_ipv6_managed_prefix_list.id]
+      to_port         = random_integer.iperf_port.result
+    },
+    {
+      from_port       = random_integer.iperf_port.result
+      ip_protocol     = "udp"
+      prefix_list_ids = [module.ingress_ssh_ipv4_managed_prefix_list.id, module.ingress_iperf_ipv6_managed_prefix_list.id]
+      to_port         = random_integer.iperf_port.result
+    },
+  ]
 }
 
 # iperf EC2 Instance
@@ -175,7 +189,7 @@ module "iperf_ec2_instance" {
   source = "../modules/ec2-instance"
 
   name              = "iperf-${var.environment}"
-  ami               = var.iperf_instance_ami
+  ami               = data.aws_ami.ubuntu_image.id
   availability_zone = module.subnets[random_integer.iperf_subnet_index.result].availability_zone
   instance_type     = var.iperf_instance_type
   key_name          = module.admin_key_pair.key_name
@@ -186,9 +200,8 @@ module "iperf_ec2_instance" {
 
   vpc_security_group_ids = [
     module.egress_to_anywhere_security_group.id,
-    module.ingress_icmp_echo_request_from_anywhere_security_group.id,
+    module.ingress_ping_from_anywhere_security_group.id,
     module.ingress_ssh_security_group.id,
-    module.ingress_iperf_tcp_security_group.id,
-    module.ingress_iperf_udp_security_group.id,
+    module.ingress_iperf_security_group.id,
   ]
 }
