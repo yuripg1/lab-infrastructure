@@ -18,4 +18,8 @@ resource "aws_instance" "main" {
   tags = {
     Name = var.name
   }
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
 }

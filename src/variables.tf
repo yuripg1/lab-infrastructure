@@ -34,10 +34,6 @@ variable "ingress_iperf_ipv6_managed_prefix_list_entries_cidr" {
   type = list(string)
 }
 
-variable "iperf_instance_ami" {
-  type = string
-}
-
 variable "iperf_instance_type" {
   type = string
 }
