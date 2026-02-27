@@ -11,6 +11,7 @@ number_of_availability_zones_to_use = 1
 admin_key_pair_public_key = "ssh-ed25519 ***** *****"
 
 ingress_ssh_ipv4_managed_prefix_list_entries_cidr = ["*.*.*.*/32"]
+ingress_ssh_ipv6_managed_prefix_list_entries_cidr = ["*:*:*:*::/64"]
 
 #################### iperf ####################
 

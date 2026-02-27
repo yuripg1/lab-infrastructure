@@ -24,6 +24,10 @@ variable "ingress_ssh_ipv4_managed_prefix_list_entries_cidr" {
   type = list(string)
 }
 
+variable "ingress_ssh_ipv6_managed_prefix_list_entries_cidr" {
+  type = list(string)
+}
+
 #################### iperf ####################
 
 variable "ingress_iperf_ipv4_managed_prefix_list_entries_cidr" {

@@ -71,6 +71,16 @@ module "ingress_ssh_ipv4_managed_prefix_list" {
   entries_cidr   = var.ingress_ssh_ipv4_managed_prefix_list_entries_cidr
 }
 
+# Ingress SSH IPv6 Managed Prefix List
+module "ingress_ssh_ipv6_managed_prefix_list" {
+  source = "../modules/managed-prefix-list"
+
+  name           = "ingress-ssh-ipv6"
+  address_family = "IPv6"
+  max_entries    = 2
+  entries_cidr   = var.ingress_ssh_ipv6_managed_prefix_list_entries_cidr
+}
+
 # Egress to anywhere (Security Group)
 module "egress_to_anywhere_security_group" {
   source = "../modules/security-group"
@@ -121,10 +131,14 @@ module "ingress_ssh_security_group" {
 
   ingress_rules = [
     {
-      from_port       = 22
-      ip_protocol     = "tcp"
-      prefix_list_ids = [module.ingress_ssh_ipv4_managed_prefix_list.id]
-      to_port         = 22
+      from_port   = 22
+      ip_protocol = "tcp"
+      to_port     = 22
+
+      prefix_list_ids = [
+        module.ingress_ssh_ipv4_managed_prefix_list.id,
+        module.ingress_ssh_ipv6_managed_prefix_list.id,
+      ],
     },
   ]
 }
@@ -170,16 +184,24 @@ module "ingress_iperf_security_group" {
 
   ingress_rules = [
     {
-      from_port       = random_integer.iperf_port.result
-      ip_protocol     = "tcp"
-      prefix_list_ids = [module.ingress_ssh_ipv4_managed_prefix_list.id, module.ingress_iperf_ipv6_managed_prefix_list.id]
-      to_port         = random_integer.iperf_port.result
+      from_port   = random_integer.iperf_port.result
+      ip_protocol = "tcp"
+      to_port     = random_integer.iperf_port.result
+
+      prefix_list_ids = [
+        module.ingress_ssh_ipv4_managed_prefix_list.id,
+        module.ingress_iperf_ipv6_managed_prefix_list.id,
+      ]
     },
     {
-      from_port       = random_integer.iperf_port.result
-      ip_protocol     = "udp"
-      prefix_list_ids = [module.ingress_ssh_ipv4_managed_prefix_list.id, module.ingress_iperf_ipv6_managed_prefix_list.id]
-      to_port         = random_integer.iperf_port.result
+      from_port   = random_integer.iperf_port.result
+      ip_protocol = "udp"
+      to_port     = random_integer.iperf_port.result
+
+      prefix_list_ids = [
+        module.ingress_ssh_ipv4_managed_prefix_list.id,
+        module.ingress_iperf_ipv6_managed_prefix_list.id,
+      ]
     },
   ]
 }
