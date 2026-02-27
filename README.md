@@ -42,7 +42,8 @@ Before running Terraform, it is necessary to have
 ```shell
 $ cd ./src
 $ terraform init -backend-config=../environments/prd/backend.config
-$ terraform fmt -recursive .. && terraform validate
+$ terraform fmt -recursive ..
+$ terraform validate
 ```
 
 ## First-time run
