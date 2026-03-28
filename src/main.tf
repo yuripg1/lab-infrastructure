@@ -81,11 +81,11 @@ module "ingress_ssh_ipv6_managed_prefix_list" {
   entries_cidr   = var.ingress_ssh_ipv6_managed_prefix_list_entries_cidr
 }
 
-# Egress to anywhere (Security Group)
-module "egress_to_anywhere_security_group" {
+# Essentials - Egress to anywhere / Ping from anywhere (Security Group)
+module "essentials_security_group" {
   source = "../modules/security-group"
 
-  name   = "egress-to-anywhere"
+  name   = "essentials"
   vpc_id = module.vpc.id
 
   egress_rules = [
@@ -95,16 +95,6 @@ module "egress_to_anywhere_security_group" {
       prefix_list_ids = []
     },
   ]
-
-  ingress_rules = []
-}
-
-# Ingress ping from anywhere (Security Group)
-module "ingress_ping_from_anywhere_security_group" {
-  source = "../modules/security-group"
-
-  name   = "ingress-ping-from-anywhere"
-  vpc_id = module.vpc.id
 
   ingress_rules = [
     {
@@ -221,8 +211,7 @@ module "iperf_ec2_instance" {
   volume_type       = var.iperf_instance_volume_type
 
   vpc_security_group_ids = [
-    module.egress_to_anywhere_security_group.id,
-    module.ingress_ping_from_anywhere_security_group.id,
+    module.essentials_security_group.id,
     module.ingress_ssh_security_group.id,
     module.ingress_iperf_security_group.id,
   ]
