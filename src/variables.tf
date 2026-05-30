@@ -42,7 +42,7 @@ variable "iperf_instance_type" {
   type = string
 }
 
-variable "iperf_instance_encryped" {
+variable "iperf_instance_encrypted" {
   type = bool
 }
 

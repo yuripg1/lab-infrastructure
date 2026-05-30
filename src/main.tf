@@ -206,7 +206,7 @@ module "iperf_ec2_instance" {
   instance_type     = var.iperf_instance_type
   key_name          = module.admin_key_pair.key_name
   subnet_id         = module.subnets[random_integer.iperf_subnet_index.result].id
-  encrypted         = var.iperf_instance_encryped
+  encrypted         = var.iperf_instance_encrypted
   volume_size       = var.iperf_instance_volume_size
   volume_type       = var.iperf_instance_volume_type
 
