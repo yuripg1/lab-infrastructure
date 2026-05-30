@@ -2,7 +2,7 @@
 
 ## Summary
 
-This project aims to facilitate and quicken the creation of a secure cloud environment with one or more VMs for any necessary purposes (it's got "lab" in the name, after all).
+This project aims to facilitate and accelerate the creation of a secure cloud environment with one or more VMs for any necessary purposes (as it has "lab" in the name, after all).
 
 It enables the creation and seamless integration of:
 
@@ -25,9 +25,9 @@ You can configure its **[variables.tfvars](./environments/prd/variables.tfvars)*
 The current setup:
 
 * Supports IPv4 and IPv6 connectivity
-* Includes Security Groups that allow all egress traffic and ingress pings by default
+* Includes Security Groups that allow all egress traffic and ingress ping requests by default
 * Allows management access via SSH by the specified addresses
-* Spins up an Ubuntu 24.04 (amd64) VM with firewall rules aimed at allowing ingress traffic to an application such as iperf
+* Provisions an Ubuntu 24.04 (amd64) VM with firewall rules aimed at allowing ingress traffic to an application such as iperf
 
 ## Basic prerequisites
 
@@ -37,7 +37,7 @@ Before running Terraform, it is necessary to have
 * S3 Bucket for storing **terraform.tfstate**
 * Reference the S3 Bucket in the **[backend.config](./environments/prd/backend.config)** file
 
-## Initialization and validations
+## Initialization and validation
 
 ```shell
 $ cd ./src
